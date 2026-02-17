@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golden Hour Studio – ULTIMATE x3</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+ font-family:'Poppins',sans-serif;
+ background:linear-gradient(135deg,#ffecd2,#fcb69f,#f6d365,#fdc830);
+ background-size:300% 300%;
+ animation:bgMove 15s ease infinite;
+ color:#4e342e;
+}
+@keyframes bgMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+header{
+ padding:15px;
+ display:flex;
+ flex-wrap:wrap;
+ justify-content:space-between;
+ align-items:center;
+ background:rgba(255,255,255,0.4);
+ backdrop-filter:blur(15px);
+}
+button,input{font-family:inherit}
+button{
+ background:#ff9a3c;
+ border:none;
+ padding:8px 14px;
+ border-radius:14px;
+ cursor:pointer;
+ transition:.25s;
+ font-weight:600;
+}
+button:hover{transform:scale(1.05);background:#ff7b00}
+.container{display:flex;flex-wrap:wrap}
+.panel{
+ flex:1 1 260px;
+ padding:15px;
+ background:rgba(255,255,255,0.35);
+ backdrop-filter:blur(15px);
+}
+.canvas-wrap{
+ flex:3 1 500px;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ padding:20px;
+}
+canvas{
+ max-width:100%;
+ border-radius:25px;
+ box-shadow:0 30px 60px rgba(0,0,0,.25);
+ background:white;
+}
+.layers{
+ flex:1 1 200px;
+ padding:15px;
+ background:rgba(255,255,255,0.35);
+ backdrop-filter:blur(15px);
+}
+.layers ul{list-style:none}
+.layers li{
+ padding:6px;
+ border-radius:10px;
+ cursor:pointer;
+}
+.layers li.active{background:#ff9a3c;color:white}
+label{display:block;margin:10px 0;font-size:14px}
+@media(max-width:768px){.container{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<header>
+ <strong>🌅 Golden Hour Studio – ULTIMATE</strong>
+ <div>
+  <input type="file" id="upload" accept="image/*">
+  <button onclick="addTextLayer()">Text</button>
+  <button onclick="addSticker()">Sticker</button>
+  <button onclick="downloadImage('png')">PNG</button>
+  <button onclick="downloadImage('jpeg')">JPG</button>
+ </div>
+</header>
+
+<div class="container">
+
+<div class="panel">
+ <h3>Pro Adjustments</h3>
+ <label>Brightness <input type="range" id="brightness" min="50" max="150" value="100"></label>
+ <label>Contrast <input type="range" id="contrast" min="50" max="150" value="100"></label>
+ <label>Blur <input type="range" id="blur" min="0" max="15" value="0"></label>
+ <label>Warmth <input type="range" id="warmth" min="0" max="100" value="0"></label>
+ <label>Rotate Layer <input type="range" id="rotate" min="-180" max="180" value="0"></label>
+ <label>Scale Layer <input type="range" id="scale" min="10" max="300" value="100"></label>
+</div>
+
+<div class="canvas-wrap">
+ <canvas id="canvas"></canvas>
+</div>
+
+<div class="layers">
+ <h3>Layers</h3>
+ <ul id="layersList"></ul>
+</div>
+
+</div>
+
+<script>
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+let baseImage=new Image();
+let layers=[];
+let selectedLayer=null;
+let dragging=false;
+
+// Upload
+document.getElementById('upload').addEventListener('change',e=>{
+ const reader=new FileReader();
+ reader.onload=()=>baseImage.src=reader.result;
+ reader.readAsDataURL(e.target.files[0]);
+});
+
+baseImage.onload=()=>{
+ canvas.width=baseImage.width;
+ canvas.height=baseImage.height;
+ draw();
+};
+
+function draw(){
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ ctx.filter=`brightness(${brightness.value}%) contrast(${contrast.value}%) blur(${blur.value}px)`;
+ ctx.drawImage(baseImage,0,0);
+ ctx.filter='none';
+
+ if(warmth.value>0){
+  ctx.fillStyle=`rgba(255,120,0,${warmth.value/300})`;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+ }
+
+ layers.forEach(layer=>{
+  ctx.save();
+  ctx.translate(layer.x,layer.y);
+  ctx.rotate(layer.rotation*Math.PI/180);
+  ctx.scale(layer.scale/100,layer.scale/100);
+
+  if(layer.type==='text'){
+    ctx.font=`${layer.size}px Poppins`;
+    ctx.fillStyle=layer.color;
+    ctx.fillText(layer.text,0,0);
+  }
+  if(layer.type==='sticker'){
+    ctx.font=`60px serif`;
+    ctx.fillText(layer.emoji,0,0);
+  }
+
+  ctx.restore();
+ });
+}
+
+// Controls update
+document.querySelectorAll('input[type=range]').forEach(el=>{
+ el.addEventListener('input',()=>{
+  if(selectedLayer){
+    selectedLayer.rotation=rotate.value;
+    selectedLayer.scale=scale.value;
+  }
+  draw();
+ });
+});
+
+function addTextLayer(){
+ const text=prompt('Enter text');
+ if(!text)return;
+ const layer={id:Date.now(),type:'text',text,x:150,y:150,size:50,color:'#4e342e',rotation:0,scale:100};
+ layers.push(layer);
+ selectedLayer=layer;
+ renderLayers();draw();
+}
+
+function addSticker(){
+ const emoji=prompt('Enter emoji (🔥🌸✨😎)');
+ if(!emoji)return;
+ const layer={id:Date.now(),type:'sticker',emoji,x:200,y:200,rotation:0,scale:100};
+ layers.push(layer);
+ selectedLayer=layer;
+ renderLayers();draw();
+}
+
+function renderLayers(){
+ layersList.innerHTML='';
+ layers.forEach(l=>{
+  const li=document.createElement('li');
+  li.textContent=l.type;
+  if(l===selectedLayer)li.classList.add('active');
+  li.onclick=()=>{selectedLayer=l;rotate.value=l.rotation;scale.value=l.scale;renderLayers();};
+  layersList.appendChild(li);
+ });
+}
+
+// Drag support
+canvas.addEventListener('mousedown',()=>dragging=true);
+canvas.addEventListener('mouseup',()=>dragging=false);
+canvas.addEventListener('mousemove',e=>{
+ if(!dragging||!selectedLayer)return;
+ const rect=canvas.getBoundingClientRect();
+ selectedLayer.x=e.clientX-rect.left;
+ selectedLayer.y=e.clientY-rect.top;
+ draw();
+});
+canvas.addEventListener('touchmove',e=>{
+ if(!selectedLayer)return;
+ const rect=canvas.getBoundingClientRect();
+ selectedLayer.x=e.touches[0].clientX-rect.left;
+ selectedLayer.y=e.touches[0].clientY-rect.top;
+ draw();
+});
+
+function downloadImage(format){
+ const link=document.createElement('a');
+ link.download='golden-hour.'+format;
+ link.href=canvas.toDataURL('image/'+format);
+ link.click();
+}
+</script>
+
+</body>
+</html>
