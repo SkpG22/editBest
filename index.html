@@ -3,93 +3,145 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Golden Hour Studio – ULTIMATE x3</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<title>Golden Hour Studio – LAUNCH EDITION</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{
  font-family:'Poppins',sans-serif;
- background:linear-gradient(135deg,#ffecd2,#fcb69f,#f6d365,#fdc830);
- background-size:300% 300%;
- animation:bgMove 15s ease infinite;
- color:#4e342e;
+ background:linear-gradient(-45deg,#ffecd2,#fcb69f,#f6d365,#ff9a9e,#fad0c4);
+ background-size:400% 400%;
+ animation:gradientMove 20s ease infinite;
+ color:#5a2d0c;
+ min-height:100vh;
 }
-@keyframes bgMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes gradientMove{
+ 0%{background-position:0% 50%}
+ 50%{background-position:100% 50%}
+ 100%{background-position:0% 50%}
+}
 header{
- padding:15px;
+ padding:20px 30px;
  display:flex;
  flex-wrap:wrap;
  justify-content:space-between;
  align-items:center;
- background:rgba(255,255,255,0.4);
- backdrop-filter:blur(15px);
+ backdrop-filter:blur(25px);
+ background:rgba(255,255,255,0.35);
+ border-bottom:1px solid rgba(255,255,255,0.3);
+}
+header h1{
+ font-family:'Playfair Display',serif;
+ font-size:26px;
+ letter-spacing:1px;
+}
+.top-buttons{
+ display:flex;
+ gap:10px;
+ flex-wrap:wrap;
 }
 button,input{font-family:inherit}
 button{
- background:#ff9a3c;
+ background:linear-gradient(135deg,#ffb347,#ff7e5f);
  border:none;
- padding:8px 14px;
- border-radius:14px;
+ padding:10px 18px;
+ border-radius:20px;
  cursor:pointer;
- transition:.25s;
+ font-weight:600;
+ color:white;
+ box-shadow:0 10px 25px rgba(0,0,0,.2);
+ transition:.3s ease;
+}
+button:hover{
+ transform:translateY(-4px) scale(1.05);
+ box-shadow:0 20px 40px rgba(0,0,0,.3);
+}
+.app{
+ display:flex;
+ flex-wrap:wrap;
+ padding:20px;
+ gap:20px;
+}
+.sidebar,.layers{
+ flex:1 1 260px;
+ background:rgba(255,255,255,0.25);
+ backdrop-filter:blur(25px);
+ border-radius:25px;
+ padding:20px;
+ box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+.sidebar h3,.layers h3{
+ margin-bottom:15px;
  font-weight:600;
 }
-button:hover{transform:scale(1.05);background:#ff7b00}
-.container{display:flex;flex-wrap:wrap}
-.panel{
- flex:1 1 260px;
- padding:15px;
- background:rgba(255,255,255,0.35);
- backdrop-filter:blur(15px);
+label{
+ display:block;
+ margin-bottom:15px;
+ font-size:13px;
 }
-.canvas-wrap{
- flex:3 1 500px;
+input[type=range]{width:100%}
+.canvas-area{
+ flex:3 1 600px;
  display:flex;
  justify-content:center;
  align-items:center;
- padding:20px;
+ background:rgba(255,255,255,0.2);
+ backdrop-filter:blur(20px);
+ border-radius:30px;
+ padding:30px;
+ box-shadow:0 30px 60px rgba(0,0,0,.25);
 }
 canvas{
  max-width:100%;
  border-radius:25px;
- box-shadow:0 30px 60px rgba(0,0,0,.25);
+ box-shadow:0 40px 80px rgba(0,0,0,.3);
  background:white;
 }
-.layers{
- flex:1 1 200px;
- padding:15px;
- background:rgba(255,255,255,0.35);
- backdrop-filter:blur(15px);
-}
-.layers ul{list-style:none}
+.layers ul{list-style:none;margin-top:10px}
 .layers li{
- padding:6px;
- border-radius:10px;
+ padding:10px;
+ border-radius:15px;
+ margin-bottom:8px;
  cursor:pointer;
+ background:rgba(255,255,255,0.5);
+ transition:.2s;
 }
-.layers li.active{background:#ff9a3c;color:white}
-label{display:block;margin:10px 0;font-size:14px}
-@media(max-width:768px){.container{flex-direction:column}}
+.layers li.active{
+ background:linear-gradient(135deg,#ffb347,#ff7e5f);
+ color:white;
+}
+.footer{
+ text-align:center;
+ padding:15px;
+ font-size:13px;
+ opacity:.8;
+}
+@media(max-width:900px){
+ .app{flex-direction:column}
+ .sidebar,.layers,.canvas-area{width:100%}
+}
 </style>
 </head>
 <body>
 
 <header>
- <strong>🌅 Golden Hour Studio – ULTIMATE</strong>
- <div>
+ <h1>🌅 Golden Hour Studio – Launch</h1>
+ <div class="top-buttons">
   <input type="file" id="upload" accept="image/*">
   <button onclick="addTextLayer()">Text</button>
   <button onclick="addSticker()">Sticker</button>
+  <button onclick="duplicateLayer()">Duplicate</button>
+  <button onclick="deleteLayer()">Delete</button>
   <button onclick="downloadImage('png')">PNG</button>
   <button onclick="downloadImage('jpeg')">JPG</button>
  </div>
 </header>
 
-<div class="container">
+<div class="app">
 
-<div class="panel">
- <h3>Pro Adjustments</h3>
+<div class="sidebar">
+ <h3>🎨 Adjustments</h3>
  <label>Brightness <input type="range" id="brightness" min="50" max="150" value="100"></label>
  <label>Contrast <input type="range" id="contrast" min="50" max="150" value="100"></label>
  <label>Blur <input type="range" id="blur" min="0" max="15" value="0"></label>
@@ -98,16 +150,18 @@ label{display:block;margin:10px 0;font-size:14px}
  <label>Scale Layer <input type="range" id="scale" min="10" max="300" value="100"></label>
 </div>
 
-<div class="canvas-wrap">
+<div class="canvas-area">
  <canvas id="canvas"></canvas>
 </div>
 
 <div class="layers">
- <h3>Layers</h3>
+ <h3>🧩 Layers</h3>
  <ul id="layersList"></ul>
 </div>
 
 </div>
+
+<div class="footer">Made with warmth ✨ Fully responsive & aesthetic</div>
 
 <script>
 const canvas=document.getElementById('canvas');
@@ -117,8 +171,7 @@ let layers=[];
 let selectedLayer=null;
 let dragging=false;
 
-// Upload
-document.getElementById('upload').addEventListener('change',e=>{
+upload.addEventListener('change',e=>{
  const reader=new FileReader();
  reader.onload=()=>baseImage.src=reader.result;
  reader.readAsDataURL(e.target.files[0]);
@@ -135,33 +188,30 @@ function draw(){
  ctx.filter=`brightness(${brightness.value}%) contrast(${contrast.value}%) blur(${blur.value}px)`;
  ctx.drawImage(baseImage,0,0);
  ctx.filter='none';
-
  if(warmth.value>0){
-  ctx.fillStyle=`rgba(255,120,0,${warmth.value/300})`;
+  ctx.fillStyle=`rgba(255,140,0,${warmth.value/300})`;
   ctx.fillRect(0,0,canvas.width,canvas.height);
  }
-
  layers.forEach(layer=>{
   ctx.save();
   ctx.translate(layer.x,layer.y);
   ctx.rotate(layer.rotation*Math.PI/180);
   ctx.scale(layer.scale/100,layer.scale/100);
-
   if(layer.type==='text'){
     ctx.font=`${layer.size}px Poppins`;
     ctx.fillStyle=layer.color;
+    ctx.shadowColor='rgba(0,0,0,0.3)';
+    ctx.shadowBlur=20;
     ctx.fillText(layer.text,0,0);
   }
   if(layer.type==='sticker'){
-    ctx.font=`60px serif`;
+    ctx.font=`70px serif`;
     ctx.fillText(layer.emoji,0,0);
   }
-
   ctx.restore();
  });
 }
 
-// Controls update
 document.querySelectorAll('input[type=range]').forEach(el=>{
  el.addEventListener('input',()=>{
   if(selectedLayer){
@@ -173,26 +223,37 @@ document.querySelectorAll('input[type=range]').forEach(el=>{
 });
 
 function addTextLayer(){
- const text=prompt('Enter text');
+ const text=prompt('Enter aesthetic text');
  if(!text)return;
- const layer={id:Date.now(),type:'text',text,x:150,y:150,size:50,color:'#4e342e',rotation:0,scale:100};
+ const layer={id:Date.now(),type:'text',text,x:200,y:200,size:60,color:'#5a2d0c',rotation:0,scale:100};
  layers.push(layer);
  selectedLayer=layer;
  renderLayers();draw();
 }
-
 function addSticker(){
- const emoji=prompt('Enter emoji (🔥🌸✨😎)');
+ const emoji=prompt('Enter emoji ✨🔥🌸💫');
  if(!emoji)return;
- const layer={id:Date.now(),type:'sticker',emoji,x:200,y:200,rotation:0,scale:100};
+ const layer={id:Date.now(),type:'sticker',emoji,x:250,y:250,rotation:0,scale:100};
  layers.push(layer);
  selectedLayer=layer;
  renderLayers();draw();
 }
-
+function duplicateLayer(){
+ if(!selectedLayer)return;
+ const copy={...selectedLayer,id:Date.now(),x:selectedLayer.x+20,y:selectedLayer.y+20};
+ layers.push(copy);
+ selectedLayer=copy;
+ renderLayers();draw();
+}
+function deleteLayer(){
+ if(!selectedLayer)return;
+ layers=layers.filter(l=>l!==selectedLayer);
+ selectedLayer=null;
+ renderLayers();draw();
+}
 function renderLayers(){
  layersList.innerHTML='';
- layers.forEach(l=>{
+ layers.slice().reverse().forEach(l=>{
   const li=document.createElement('li');
   li.textContent=l.type;
   if(l===selectedLayer)li.classList.add('active');
@@ -200,8 +261,6 @@ function renderLayers(){
   layersList.appendChild(li);
  });
 }
-
-// Drag support
 canvas.addEventListener('mousedown',()=>dragging=true);
 canvas.addEventListener('mouseup',()=>dragging=false);
 canvas.addEventListener('mousemove',e=>{
@@ -218,10 +277,9 @@ canvas.addEventListener('touchmove',e=>{
  selectedLayer.y=e.touches[0].clientY-rect.top;
  draw();
 });
-
 function downloadImage(format){
  const link=document.createElement('a');
- link.download='golden-hour.'+format;
+ link.download='golden-hour-launch.'+format;
  link.href=canvas.toDataURL('image/'+format);
  link.click();
 }
@@ -229,3 +287,4 @@ function downloadImage(format){
 
 </body>
 </html>
+
